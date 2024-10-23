@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="come.dawnlight.chronicle_dawnlight.mapper.UserMapper">
+    <insert id="registerUser" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.UserPO">
+        INSERT INTO user (id, username, password, email, avatar, status, role, created_at, updated_at)
+        VALUES (#{user.id}, #{user.username}, #{user.password}, #{user.email}, #{user.avatar}, #{user.status}, #{user.role}, #{user.createdAt}, #{user.updatedAt});
+        INSERT INTO user_role (user_id ,role_id)
+        VALUES (#{user.id}, #{user.role})
+    </insert>
+    <select id="loginByPassword" resultType="java.lang.Integer">
+        SELECT username,password
+        FROM user
+        WHERE username = #{name} AND password = #{password}
+    </select>
+    <select id="selectByEmail" resultType="java.lang.String">
+        SELECT username
+        FROM user
+        WHERE email = #{email}
+    </select>
+    <update id="update">
+        UPDATE user
+        <set>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <select id="select" resultType="integer">
+        select *
+        from user
+        where
+        <if test="id != null">avatar = #{avatar},</if>
+        <if test="username != null">username = #{username},</if>
+        <if test="email != null">email = #{email},</if>
+    </select>
+</mapper>
+
