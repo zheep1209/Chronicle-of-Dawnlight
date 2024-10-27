@@ -1,6 +1,7 @@
 package come.dawnlight.chronicle_dawnlight.controller;
 
 import come.dawnlight.chronicle_dawnlight.common.Result;
+import come.dawnlight.chronicle_dawnlight.common.exception.BaseException;
 import come.dawnlight.chronicle_dawnlight.common.utils.GetCaptcha;
 import come.dawnlight.chronicle_dawnlight.common.utils.HttpClientUtils;
 import come.dawnlight.chronicle_dawnlight.common.utils.RedisUtil;
@@ -23,12 +24,14 @@ public class CaptchaController {
     @Autowired
     private RedisUtil redisUtil;
 
-    /*
-    获取邮箱验证码
+    /**
+     * 获取邮箱验证码
+     * @param email
+     * @return
      */
     @GetMapping("/getEmail")
     public Result getEmail(@RequestParam String email) throws IOException {
-
+//
         String code = GetCaptcha.generateSixDigitCode();
         redisUtil.set("code", code, 5);
 
@@ -45,7 +48,6 @@ public class CaptchaController {
         jsonMap.put("smtpEmail", "zheep1209@qq.com");
         jsonMap.put("smtpCodeType", "qq");
         String result = HttpClientUtils.post(url, jsonMap);
-        System.out.println("返回结果" + result);
         JSONObject jsonObj = new JSONObject(result);
         if (jsonObj.getInt("code") == 0) {
             return Result.success();

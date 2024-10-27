@@ -3,6 +3,9 @@ package come.dawnlight.chronicle_dawnlight.service;
 import come.dawnlight.chronicle_dawnlight.common.Result;
 import come.dawnlight.chronicle_dawnlight.common.exception.BaseException;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.UserDTO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.UserVO;
+
+import java.util.UUID;
 
 public interface UserService {
     Integer registerUser(UserDTO userDTO, String code) throws BaseException;
@@ -16,4 +19,6 @@ public interface UserService {
     void updateUserName(String id, String username) throws BaseException;
 
     void updatePassward(String id, String password,String code) throws BaseException;
+
+    Result getUser(UUID currentThreadId);
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="come.dawnlight.chronicle_dawnlight.mapper.ArticleMapper">
+    <select id="selectByIdAndUserId" parameterType="map" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        SELECT * FROM article WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        INSERT INTO article (user_id, title, content, is_private, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{content}, #{isPrivate}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        UPDATE article
+        SET title = #{title}, content = #{content}, is_private = #{isPrivate}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE FROM article WHERE id = #{id}
+    </delete>
+
+    <select id="selectByUserId" parameterType="String" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        SELECT * FROM article WHERE user_id = #{userId}
+    </select>
+</mapper>

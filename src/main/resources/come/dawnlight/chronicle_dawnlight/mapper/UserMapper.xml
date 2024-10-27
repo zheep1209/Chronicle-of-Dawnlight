@@ -5,13 +5,17 @@
     <insert id="registerUser" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.UserPO">
         INSERT INTO user (id, username, password, email, avatar, status, role, created_at, updated_at)
         VALUES (#{user.id}, #{user.username}, #{user.password}, #{user.email}, #{user.avatar}, #{user.status}, #{user.role}, #{user.createdAt}, #{user.updatedAt});
-        INSERT INTO user_role (user_id ,role_id)
-        VALUES (#{user.id}, #{user.role})
     </insert>
-    <select id="loginByPassword" resultType="java.lang.Integer">
-        SELECT username,password
+
+
+    <!--    <insert id="registerUserRole" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.UserPO">-->
+<!--        INSERT INTO user_role (user_id, role_id)-->
+<!--        VALUES (#{id}, #{role});-->
+<!--    </insert>-->
+    <select id="loginByPassword" resultType="java.lang.String">
+        SELECT *
         FROM user
-        WHERE username = #{name} AND password = #{password}
+        WHERE username = #{identifier} AND password = #{password}
     </select>
     <select id="selectByEmail" resultType="java.lang.String">
         SELECT username
@@ -23,17 +27,27 @@
         <set>
             <if test="avatar != null">avatar = #{avatar},</if>
             <if test="username != null">username = #{username},</if>
-            <if test="password != null">password = #{password}</if>
+            <if test="password != null">password = #{password},</if>
+            updated_at = #{updatedAt}
         </set>
         WHERE id = #{id}
     </update>
-    <select id="select" resultType="integer">
-        select *
+    <select id="select" resultType="java.lang.String">
+        select id
         from user
-        where
-        <if test="id != null">avatar = #{avatar},</if>
-        <if test="username != null">username = #{username},</if>
-        <if test="email != null">email = #{email},</if>
+        <where>
+            <if test="username != null">and username = #{username}</if>
+            <if test="email != null">and email = #{email}</if>
+        </where>
+    </select>
+    <select id="selectByUserName" resultType="java.lang.String">
+        select id
+        from user
+        where username = #{username}
+    </select>
+    <select id="getUser" resultType="come.dawnlight.chronicle_dawnlight.pojo.vo.UserVO">
+        select username,email,avatar,role
+        from user
+        where id = #{id}
     </select>
 </mapper>
-

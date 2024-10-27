@@ -1,6 +1,7 @@
 package come.dawnlight.chronicle_dawnlight.mapper;
 
 import come.dawnlight.chronicle_dawnlight.pojo.po.UserPO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.UserVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,7 +15,7 @@ public interface UserMapper {
     /**
      *用户名密码登录
      */
-    Integer loginByPassword(String identifier, String password);
+    String loginByPassword(@Param("identifier") String identifier, @Param("password") String password);
     /**
      *查询
      */
@@ -23,7 +24,13 @@ public interface UserMapper {
     // id 和 avatar 是必需的
     void update(UserPO userPO);
     /**
-     *查询用户名
+     *查重
      */
-    Integer select(UserPO userPO);
+    String select(UserPO userPO);
+    /**
+     * 用户名查询ID
+     */
+    String selectByUserName(String username);
+
+    UserVO getUser(String id);
 }

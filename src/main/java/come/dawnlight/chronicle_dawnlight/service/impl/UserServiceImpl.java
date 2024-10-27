@@ -9,8 +9,10 @@ import come.dawnlight.chronicle_dawnlight.mapper.RoleMapper;
 import come.dawnlight.chronicle_dawnlight.mapper.UserMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.UserDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.UserPO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.UserVO;
 import come.dawnlight.chronicle_dawnlight.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ public class UserServiceImpl implements UserService {
         // 校验用户名是否重复
         UserPO temp = new UserPO();
         temp.setUsername(userDTO.getUsername());
-        if (userMapper.select(temp)>=1)
+        if (userMapper.select(temp)!=null)
             throw new BaseException("用户名"+userDTO.getUsername()+"重复");
         // 校验邮箱
         if (!isValidEmail(userDTO.getEmail())) {
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
         // 校验邮箱是否重复
         temp = new UserPO();
         temp.setUsername(userDTO.getEmail());
-        if (userMapper.select(temp)>=1)
+        if (userMapper.select(temp)!=null)
             throw new BaseException("该邮箱已注册");
 
         // 校验密码
@@ -71,7 +73,7 @@ public class UserServiceImpl implements UserService {
 //        UUID
         userPO.setId(UUID.randomUUID().toString());
 //        默认头像
-        userPO.setAvatar("ks");
+        userPO.setAvatar("https://img.picgo.net/2024/10/25/d693c6f605470263c9e42740e8bed7d2909387c156c4a646.png");
 //        密码加密
         userPO.setPassword(DigestUtils.md5DigestAsHex(userDTO.getPassword().getBytes()));
 //        新增状态
@@ -87,16 +89,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result loginByPassword(String identifier, String password) {
-        int loginResult = userMapper.loginByPassword(identifier, password);
-
-        switch (loginResult) {
-            case 0:
-                return Result.success();
-            case 1:
-                return Result.error("账号或密码错误");
-            default:
-                return Result.error("未知错误，请联系管理员");
+    public Result loginByPassword(@Param("identifier") String identifier, @Param("password") String password) {
+        String loginResult = userMapper.loginByPassword(identifier, DigestUtils.md5DigestAsHex(password.getBytes()));
+        if (loginResult == null) {
+            return Result.error("用户名或密码错误");
+        }else {
+            return Result.success(loginResult);
         }
     }
 
@@ -121,6 +119,7 @@ public class UserServiceImpl implements UserService {
         UserPO userPO = new UserPO();
         userPO.setId(id);
         userPO.setAvatar(avatar);
+        userPO.setUpdatedAt(LocalDateTime.now());
         userMapper.update(userPO);
     }
     //修改用户名
@@ -129,11 +128,12 @@ public class UserServiceImpl implements UserService {
         // 校验用户名是否重复
         UserPO temp = new UserPO();
         temp.setUsername(username);
-        if (userMapper.select(temp)>=1)
+        if (userMapper.select(temp)!=null)
             throw new BaseException("用户名"+username+"重复");
         UserPO userPO = new UserPO();
         userPO.setId(id);
         userPO.setUsername(username);
+        userPO.setUpdatedAt(LocalDateTime.now());
         userMapper.update(userPO);
     }
     //修改密码
@@ -149,6 +149,12 @@ public class UserServiceImpl implements UserService {
         UserPO userPO = new UserPO();
         userPO.setId(id);
         userPO.setPassword(password);
+        userPO.setUpdatedAt(LocalDateTime.now());
         userMapper.update(userPO);
+    }
+
+    @Override
+    public Result getUser(UUID currentThreadId) {
+        return Result.success(userMapper.getUser(currentThreadId.toString()));
     }
 }
