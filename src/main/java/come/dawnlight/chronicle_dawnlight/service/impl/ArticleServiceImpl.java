@@ -1,7 +1,6 @@
 package come.dawnlight.chronicle_dawnlight.service.impl;
 
 import come.dawnlight.chronicle_dawnlight.mapper.ArticleMapper;
-import come.dawnlight.chronicle_dawnlight.mapper.UserMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import come.dawnlight.chronicle_dawnlight.service.ArticleService;
@@ -10,26 +9,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger log = LoggerFactory.getLogger(ArticleServiceImpl.class);
     @Autowired
-private UserMapper userMapper;
-@Autowired
-private ArticleMapper articleMapper;
+    private ArticleMapper articleMapper;
+
     @Override
     public void createArticle(ArticleDTO articleDTO, String id) {
-        // 根据用户名找到用户，并保存文章
         ArticlePO article = new ArticlePO();
         article.setUserId(id);
         article.setTitle(articleDTO.getTitle());
         article.setContent(articleDTO.getContent());
         article.setIsPrivate(articleDTO.getIsPrivate());
-        article.setCreatedAt(articleDTO.getCreatedAt());
-        article.setUpdatedAt(articleDTO.getUpdatedAt());
+        article.setCategoryId(articleDTO.getCategoryId()); // 设置分类ID
+        article.setCreatedAt(LocalDateTime.now()); // 设置创建时间
+        article.setUpdatedAt(LocalDateTime.now()); // 设置更新时间
         articleMapper.insert(article);
     }
 
@@ -41,9 +39,9 @@ private ArticleMapper articleMapper;
             article.setTitle(articleDTO.getTitle());
             article.setContent(articleDTO.getContent());
             article.setIsPrivate(articleDTO.getIsPrivate());
+            article.setCategoryId(articleDTO.getCategoryId());
             article.setCreatedAt(articleDTO.getCreatedAt());
             article.setUpdatedAt(articleDTO.getUpdatedAt());
-            log.info("数据检验：{}",articleDTO);
             articleMapper.update(article);
         }
     }
@@ -56,19 +54,45 @@ private ArticleMapper articleMapper;
         }
     }
 
+    public void deleteArticles(List<Long> ids, String userID) {
+        // 执行批量删除逻辑
+        for (Long id : ids) {
+            // 检查权限等逻辑
+            // 删除文章
+            articleMapper.delete(id);
+        }
+    }
+
     @Override
     public List<ArticlePO> getArticlesByUser(String userID) {
         return articleMapper.selectByUserId(userID);
     }
 
     @Override
+    public List<ArticlePO> getArticlesByUserAndCategory(String userId, Long categoryId) {
+        return articleMapper.selectByUserIdAndCategoryId(userId, categoryId);
+    }
+
+    @Override
     public ArticlePO getArticleById(Long id, String userID) {
         ArticlePO article = articleMapper.selectByIdAndUserId(id, userID);
-        log.info("111111111111:{}",article);
         if (article != null) {
             return article;
         }
         return null;  // 文章不存在时返回空
     }
+
+    @Override
+    public List<ArticlePO> getArticlesByCategoryId(Long categoryId) {
+        return articleMapper.selectByCategoryId(categoryId);
+    }
+
+    @Override
+    public void updateCategoryByIds(List<Long> ids, Long categoryId) {
+        articleMapper.updateCategoryIdByIds(ids, categoryId);
+    }
+
+
+
 
 }

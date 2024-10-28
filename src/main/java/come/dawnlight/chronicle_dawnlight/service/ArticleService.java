@@ -12,7 +12,15 @@ public interface ArticleService {
 
     void deleteArticle(Long id, String username);
 
+    void deleteArticles(List<Long> ids, String userID);
+
     List<ArticlePO> getArticlesByUser(String username);
 
+    List<ArticlePO> getArticlesByUserAndCategory(String userId, Long categoryId);
+
     ArticlePO getArticleById(Long id, String username);
+
+    List<ArticlePO> getArticlesByCategoryId(Long categoryId);
+
+    void updateCategoryByIds(List<Long> ids, Long categoryId);
 }

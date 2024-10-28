@@ -2,8 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="come.dawnlight.chronicle_dawnlight.mapper.ArticleMapper">
-    <select id="selectByIdAndUserId" parameterType="map" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
-        SELECT * FROM article WHERE id = #{id} AND user_id = #{userId}
+    <select id="selectByIdAndUserId" parameterType="map"
+            resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        SELECT *
+        FROM article
+        WHERE id = #{id}
+          AND user_id = #{userId}
     </select>
 
     <insert id="insert" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
@@ -13,15 +17,45 @@
 
     <update id="update" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
         UPDATE article
-        SET title = #{title}, content = #{content}, is_private = #{isPrivate}, updated_at = NOW()
+        SET title      = #{title},
+            content    = #{content},
+            is_private = #{isPrivate},
+            updated_at = NOW()
         WHERE id = #{id}
     </update>
 
     <delete id="delete" parameterType="Long">
-        DELETE FROM article WHERE id = #{id}
+        DELETE
+        FROM article
+        WHERE id = #{id}
     </delete>
 
-    <select id="selectByUserId" parameterType="String" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
-        SELECT * FROM article WHERE user_id = #{userId}
+    <select id="selectByUserId" parameterType="String"
+            resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        SELECT *
+        FROM article
+        WHERE user_id = #{userId}
     </select>
+
+    <select id="selectByUserIdAndCategoryId" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        SELECT *
+        FROM article
+        WHERE user_id = #{userId}
+          AND category_id = #{categoryId}
+    </select>
+
+    <select id="selectByCategoryId" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        SELECT *
+        FROM article
+        WHERE category_id = #{categoryId}
+    </select>
+    <update id="updateCategoryIdByIds">
+        UPDATE article
+        SET category_id = #{categoryId}
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
 </mapper>
