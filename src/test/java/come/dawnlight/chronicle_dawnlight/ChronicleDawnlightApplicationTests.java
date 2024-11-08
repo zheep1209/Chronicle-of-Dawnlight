@@ -17,6 +17,6 @@ class ChronicleDawnlightApplicationTests {
 
     @Test
     void roleTest() {
-        roleMapper.insertRole(new RolePO(4,"普通用户"));
+//        roleMapper.insertRole(new RolePO(4,"普通用户"));
     }
 }

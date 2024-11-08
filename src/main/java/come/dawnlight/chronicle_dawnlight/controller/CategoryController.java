@@ -64,7 +64,6 @@ public class CategoryController {
         categoryService.deleteCategory(id, userId);
         return Result.success("分类删除成功");
     }
-
     /**
      * 获取当前用户的所有分类
      * URL: /categories (GET)

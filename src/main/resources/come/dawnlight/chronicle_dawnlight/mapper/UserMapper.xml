@@ -4,14 +4,9 @@
 <mapper namespace="come.dawnlight.chronicle_dawnlight.mapper.UserMapper">
     <insert id="registerUser" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.UserPO">
         INSERT INTO user (id, username, password, email, avatar, status, role, created_at, updated_at)
-        VALUES (#{user.id}, #{user.username}, #{user.password}, #{user.email}, #{user.avatar}, #{user.status}, #{user.role}, #{user.createdAt}, #{user.updatedAt});
+        VALUES (#{user.id}, #{user.username}, #{user.password}, #{user.email}, #{user.avatar},
+                #{user.status}, #{user.role}, #{user.createdAt}, #{user.updatedAt});
     </insert>
-
-
-    <!--    <insert id="registerUserRole" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.UserPO">-->
-<!--        INSERT INTO user_role (user_id, role_id)-->
-<!--        VALUES (#{id}, #{role});-->
-<!--    </insert>-->
     <select id="loginByPassword" resultType="java.lang.String">
         SELECT *
         FROM user

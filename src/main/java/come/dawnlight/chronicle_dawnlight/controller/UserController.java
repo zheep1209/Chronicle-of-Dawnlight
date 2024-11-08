@@ -4,6 +4,7 @@ import come.dawnlight.chronicle_dawnlight.common.Result;
 import come.dawnlight.chronicle_dawnlight.common.exception.BaseException;
 import come.dawnlight.chronicle_dawnlight.common.utils.BaseContext;
 import come.dawnlight.chronicle_dawnlight.common.utils.JwtUtil;
+import come.dawnlight.chronicle_dawnlight.mapper.UserMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.UserDTO;
 import come.dawnlight.chronicle_dawnlight.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ public class UserController {
     public static ThreadLocal<Long> threadLocal = new ThreadLocal<>();
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserMapper userMapper;
 //    @Autowired
 //    private  JwtUtil jwtUtil;
 
@@ -61,9 +64,10 @@ public class UserController {
         // 处理邮箱 + 验证码的登录逻辑
         Result result = userService.loginByEmail(email, code);
         if (result.getCode() == 1) {
+            result.setData(userMapper.selectByUserName((String) result.getData()));
             //登录成功后，生成jwt令牌
-
             Map<String, Object> data = new HashMap<>();
+            log.info("测试测试{},{}",result,data);
             return getResult(result, data);
         } else {
             return Result.error(result.getMsg());
@@ -75,7 +79,6 @@ public class UserController {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", result.getData());
         String token = JwtUtil.createJWT("zheep", 7200000, claims);
-
         data.put("Token", token);
         data.put("id", result.getData());
         return Result.success(data);

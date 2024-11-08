@@ -67,7 +67,6 @@ public class UserServiceImpl implements UserService {
         if (!code.equals(redisUtil.get("code"))) {
             throw new BaseException("验证码错误");
         }
-
         UserPO userPO = new UserPO();
         BeanUtils.copyProperties(userDTO, userPO);
 //        UUID
@@ -92,8 +91,10 @@ public class UserServiceImpl implements UserService {
     public Result loginByPassword(@Param("identifier") String identifier, @Param("password") String password) {
         String loginResult = userMapper.loginByPassword(identifier, DigestUtils.md5DigestAsHex(password.getBytes()));
         if (loginResult == null) {
+            log.info("用户名或密码错误");
             return Result.error("用户名或密码错误");
         }else {
+            log.info("登陆成功");
             return Result.success(loginResult);
         }
     }
