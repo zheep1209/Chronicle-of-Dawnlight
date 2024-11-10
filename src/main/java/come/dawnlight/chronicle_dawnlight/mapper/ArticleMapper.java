@@ -2,6 +2,7 @@ package come.dawnlight.chronicle_dawnlight.mapper;
 
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.List;
 public interface ArticleMapper {
 
     // 插入新文章
-    void insert(ArticlePO article);
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insert(ArticlePO article);
 
     // 更新文章
     void update(ArticlePO article);

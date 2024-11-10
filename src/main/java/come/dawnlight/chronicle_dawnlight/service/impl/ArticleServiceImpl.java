@@ -1,5 +1,6 @@
 package come.dawnlight.chronicle_dawnlight.service.impl;
 
+import come.dawnlight.chronicle_dawnlight.common.utils.BaseContext;
 import come.dawnlight.chronicle_dawnlight.mapper.ArticleMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
@@ -19,7 +20,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleMapper articleMapper;
 
     @Override
-    public void createArticle(ArticleDTO articleDTO, String id) {
+    public int createArticle(ArticleDTO articleDTO, String id) {
         ArticlePO article = new ArticlePO();
         article.setUserId(id);
         article.setTitle(articleDTO.getTitle());
@@ -28,7 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCategoryId(articleDTO.getCategoryId()); // 设置分类ID
         article.setCreatedAt(LocalDateTime.now()); // 设置创建时间
         article.setUpdatedAt(LocalDateTime.now()); // 设置更新时间
-        articleMapper.insert(article);
+        return articleMapper.insert(article);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticlePO> getArticlesByCategoryId(Long categoryId) {
-        return articleMapper.selectByCategoryId(categoryId);
+        return articleMapper.selectByUserIdAndCategoryId(BaseContext.getCurrentThreadId().toString(),categoryId);
     }
 
     @Override

@@ -6,13 +6,13 @@
     <!-- 插入分类 -->
     <insert id="insert" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.CategoryPO">
         INSERT INTO categories (name, user_id, created_at, updated_at)
-        VALUES (#{name}, #{userId}, #{createdAt}, #{updatedAt})
+        VALUES (#{name}, #{userId}, NOW(), NOW())
     </insert>
 
     <!-- 更新分类 -->
     <update id="update" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.CategoryPO">
         UPDATE categories
-        SET name = #{name}, updated_at = #{updatedAt}
+        SET name = #{name}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 

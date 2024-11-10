@@ -10,7 +10,8 @@
           AND user_id = #{userId}
     </select>
 
-    <insert id="insert" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+    <insert id="insert" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO" useGeneratedKeys="true"
+            keyProperty="id">
         INSERT INTO article (user_id, title, content, is_private, created_at, updated_at)
         VALUES (#{userId}, #{title}, #{content}, #{isPrivate}, NOW(), NOW())
     </insert>
@@ -35,6 +36,7 @@
         SELECT *
         FROM article
         WHERE user_id = #{userId}
+        ORDER BY created_at DESC;
     </select>
 
     <select id="selectByUserIdAndCategoryId" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
@@ -42,6 +44,7 @@
         FROM article
         WHERE user_id = #{userId}
           AND category_id = #{categoryId}
+        ORDER BY created_at DESC;
     </select>
 
     <select id="selectByCategoryId" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
@@ -51,7 +54,13 @@
     </select>
     <update id="updateCategoryIdByIds">
         UPDATE article
-        SET category_id = #{categoryId}
+        SET category_id =
+        <if test="categoryId != null">
+            #{categoryId}
+        </if>
+        <if test="categoryId == null">
+            NULL
+        </if>
         WHERE id IN
         <foreach item="id" collection="ids" open="(" separator="," close=")">
             #{id}

@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 public class ArticleController {
     private static final Logger log = LoggerFactory.getLogger(ArticleController.class);
@@ -17,7 +19,7 @@ public class ArticleController {
     private ArticleService articleService;
 
     /**
-     * 根据用户名查找用户ID，保存文章
+     * 根据用户名查找用户ID，创建文章
      *
      * @param articleDTO
      * @return
@@ -25,8 +27,8 @@ public class ArticleController {
     @PostMapping("/article/create")
     public Result createArticle(@RequestBody ArticleDTO articleDTO) {
         String id = BaseContext.getCurrentThreadId().toString();
-        articleService.createArticle(articleDTO, id);
-        return Result.success("文章创建成功");
+        int articleId = articleService.createArticle(articleDTO, id);
+        return Result.success(articleId);
     }
 
 
@@ -47,6 +49,7 @@ public class ArticleController {
 
     /**
      * 根据用户ID和文章类型ID查询并返回文章列表
+     *
      * @param categoryId
      * @return
      */
@@ -56,6 +59,7 @@ public class ArticleController {
         List<ArticlePO> articles = articleService.getArticlesByUserAndCategory(userID, categoryId);
         return Result.success(articles);
     }
+
     /**
      * 根据用户名和文章ID进行权限检查，并删除文章
      *
@@ -97,23 +101,25 @@ public class ArticleController {
 
     /**
      * 根据分类ID获取文章列表
+     *
      * @param categoryId
      * @return
      */
     @GetMapping("/articlesByCategoryId")
-    public Result getArticlesByCategoryId(@RequestParam Long categoryId) {
+    public Result getArticlesByCategoryId( @RequestParam(value = "categoryId", required = false) Long categoryId) {
         List<ArticlePO> articles = articleService.getArticlesByCategoryId(categoryId);
         return Result.success(articles);
     }
 
     /**
      * 根据文章ID列表，批量修改文件的分类属性
+     *
      * @param ids
      * @param categoryId
      * @return
      */
     @PutMapping("/updateCategoryByIds")
-    public Result updateCategoryByIds(@RequestParam List<Long> ids, @RequestParam Long categoryId) {
+    public Result updateCategoryByIds(@RequestParam List<Long> ids, @RequestParam(value = "categoryId", required = false) Long categoryId) {
         articleService.updateCategoryByIds(ids, categoryId);
         return Result.success("分类更新成功");
     }

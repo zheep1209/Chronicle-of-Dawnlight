@@ -6,7 +6,7 @@ import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import java.util.List;
 
 public interface ArticleService {
-    void createArticle(ArticleDTO articleDTO, String username);
+    int createArticle(ArticleDTO articleDTO, String username);
 
     void updateArticle(Long id, ArticleDTO articleDTO, String username);
 
