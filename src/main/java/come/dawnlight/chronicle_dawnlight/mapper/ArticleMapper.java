@@ -30,8 +30,9 @@ public interface ArticleMapper {
     // 根据用户ID查询所有文章
     List<ArticlePO> selectByUserId(@Param("userId") String userId);
 
-    // 根据分类 ID 查询文章
+    // 根据分类 ID 查询文章（弃用）
     List<ArticlePO> selectByCategoryId(Long categoryId);
+
     // 根据文章ID列表，批量修改文件的分类属性
     void updateCategoryIdByIds(@Param("ids") List<Long> ids, @Param("categoryId") Long categoryId);
 
