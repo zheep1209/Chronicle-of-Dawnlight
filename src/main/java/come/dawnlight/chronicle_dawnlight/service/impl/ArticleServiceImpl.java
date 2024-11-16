@@ -4,9 +4,8 @@ import come.dawnlight.chronicle_dawnlight.common.utils.BaseContext;
 import come.dawnlight.chronicle_dawnlight.mapper.ArticleMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
 import come.dawnlight.chronicle_dawnlight.service.ArticleService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
-    private static final Logger log = LoggerFactory.getLogger(ArticleServiceImpl.class);
     @Autowired
     private ArticleMapper articleMapper;
 
@@ -76,11 +74,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticlePO getArticleById(Long id, String userID) {
-        ArticlePO article = articleMapper.selectByIdAndUserId(id, userID);
-        if (article != null) {
-            return article;
-        }
-        return null;  // 文章不存在时返回空
+        return articleMapper.selectByIdAndUserId(id, userID);// 文章不存在时返回空
     }
 
     @Override
@@ -93,7 +87,13 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.updateCategoryIdByIds(ids, categoryId);
     }
 
+    @Override
+    public List<ArticlePO> getPublicArticles() {
+        return articleMapper.publicArticle();
+    }
 
-
-
+    @Override
+    public ArticleVO getPublicArticleByArticleID(Long id) {
+        return articleMapper.publicArticleByArticleID(id);
+    }
 }

@@ -4,6 +4,7 @@ import come.dawnlight.chronicle_dawnlight.common.Result;
 import come.dawnlight.chronicle_dawnlight.common.utils.BaseContext;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
 import come.dawnlight.chronicle_dawnlight.service.ArticleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ public class ArticleController {
         int articleId = articleService.createArticle(articleDTO, id);
         return Result.success(articleId);
     }
-
 
     /**
      * 根据用户名和文章ID进行权限检查，并修改文章
@@ -100,16 +100,37 @@ public class ArticleController {
     }
 
     /**
-     * 根据分类ID获取文章列表
-     *
-     * @param categoryId
-     * @return
+     * 获取全部公开文章
+     * @return 文章列表
      */
-    @GetMapping("/articlesByCategoryId")
-    public Result getArticlesByCategoryId( @RequestParam(value = "categoryId", required = false) Long categoryId) {
-        List<ArticlePO> articles = articleService.getArticlesByCategoryId(categoryId);
+    @GetMapping("/publicArticle")
+    public Result getPublicArticle() {
+        List<ArticlePO> articles = articleService.getPublicArticles();
+        log.info("返回列表：{}", articles);
         return Result.success(articles);
     }
+
+    /**
+     * @param id
+     * @return
+     */
+    @GetMapping("/publicArticleByArticleID/{id}")
+    public Result getPublicArticleByArticleID(@PathVariable Long id) {
+        ArticleVO articles = articleService.getPublicArticleByArticleID(id);
+        log.info("返回文章：{}", articles);
+        return Result.success(articles);
+    }
+//    /**
+//     * 根据分类ID获取文章列表
+//     *
+//     * @param categoryId
+//     * @return
+//     */
+//    @GetMapping("/articlesByCategoryId")
+//    public Result getArticlesByCategoryId( @RequestParam(value = "categoryId", required = false) Long categoryId) {
+//        List<ArticlePO> articles = articleService.getArticlesByCategoryId(categoryId);
+//        return Result.success(articles);
+//    }
 
     /**
      * 根据文章ID列表，批量修改文件的分类属性

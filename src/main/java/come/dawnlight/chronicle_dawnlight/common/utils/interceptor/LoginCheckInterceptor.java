@@ -44,6 +44,11 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
             log.info("获取验证码，放行...");
             return true;
         }
+        if (requestURL.contains("/publicArticle")) {
+            log.info("获取公开文章，放行...");
+            return true;
+        }
+
         //  TODO 3.获取请求头中的令牌（token）
         String token = request.getHeader("Authorization");
 

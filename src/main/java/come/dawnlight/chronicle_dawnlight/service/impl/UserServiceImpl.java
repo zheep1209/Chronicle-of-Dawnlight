@@ -9,7 +9,6 @@ import come.dawnlight.chronicle_dawnlight.mapper.RoleMapper;
 import come.dawnlight.chronicle_dawnlight.mapper.UserMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.UserDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.UserPO;
-import come.dawnlight.chronicle_dawnlight.pojo.vo.UserVO;
 import come.dawnlight.chronicle_dawnlight.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
@@ -156,6 +155,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result getUser(UUID currentThreadId) {
+        log.info("用户信息{}",userMapper.getUser(currentThreadId.toString()));
         return Result.success(userMapper.getUser(currentThreadId.toString()));
     }
 }

@@ -1,15 +1,16 @@
 package come.dawnlight.chronicle_dawnlight.mapper;
 
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Mapper
 public interface ArticleMapper {
-
     // 插入新文章
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(ArticlePO article);
@@ -19,7 +20,6 @@ public interface ArticleMapper {
 
     // 根据文章ID和用户ID查询文章（确保用户只能操作自己的文章）
     ArticlePO selectByIdAndUserId(@Param("id") Long id, @Param("userId") String userId);
-
 
     // 根据用户 ID 和分类 ID 查询文章列表
     List<ArticlePO> selectByUserIdAndCategoryId(@Param("userId") String userId, @Param("categoryId") Long categoryId);
@@ -35,5 +35,8 @@ public interface ArticleMapper {
 
     // 根据文章ID列表，批量修改文件的分类属性
     void updateCategoryIdByIds(@Param("ids") List<Long> ids, @Param("categoryId") Long categoryId);
+    // 获取全部公开文章
+    List<ArticlePO> publicArticle();
 
+    ArticleVO publicArticleByArticleID(Long id);
 }

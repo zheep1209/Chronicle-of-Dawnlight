@@ -12,4 +12,6 @@ public class UserVO {
     private String email; // 邮箱，唯一
     private String avatar;
     private Integer role;
+    private Integer articleCount;
+    private Integer categoryCount;
 }

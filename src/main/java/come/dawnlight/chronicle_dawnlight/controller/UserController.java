@@ -67,7 +67,7 @@ public class UserController {
             result.setData(userMapper.selectByUserName((String) result.getData()));
             //登录成功后，生成jwt令牌
             Map<String, Object> data = new HashMap<>();
-            log.info("测试测试{},{}",result,data);
+            log.info("测试测试{},{}", result, data);
             return getResult(result, data);
         } else {
             return Result.error(result.getMsg());
@@ -78,7 +78,7 @@ public class UserController {
     private Result getResult(Result result, Map<String, Object> data) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", result.getData());
-        String token = JwtUtil.createJWT("zheep", 7200000, claims);
+        String token = JwtUtil.createJWT("zheep", 30L * 24 * 60 * 60 * 1000, claims);
         data.put("Token", token);
         data.put("id", result.getData());
         return Result.success(data);

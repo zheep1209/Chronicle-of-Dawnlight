@@ -66,5 +66,33 @@
             #{id}
         </foreach>
     </update>
+    <select id="publicArticle" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO">
+        select *
+        from chronicle_dawnlight.article
+        where is_private = 0
+        ORDER BY updated_at DESC;
+    </select>
+    <select id="publicArticleByArticleID"
+            resultType="come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO">
+        SELECT
+            u.id AS user_id,
+            u.username,
+            u.avatar,
+            (SELECT COUNT(*) FROM article a WHERE a.user_id = u.id AND a.is_private = 0) AS articleCount,
+            (SELECT COUNT(DISTINCT c.id)
+             FROM categories c
+             WHERE c.user_id = u.id) AS categoryCount,
+            a.title,
+            a.content,
+            a.created_at,
+            a.updated_at
+        FROM
+            user u
+                INNER JOIN
+            article a ON u.id = a.user_id
+        WHERE
+            a.is_private = 0
+          AND a.id = #{id}
+    </select>
 
 </mapper>

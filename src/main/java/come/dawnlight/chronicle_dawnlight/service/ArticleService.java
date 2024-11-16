@@ -2,6 +2,7 @@ package come.dawnlight.chronicle_dawnlight.service;
 
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
 
 import java.util.List;
 
@@ -23,4 +24,8 @@ public interface ArticleService {
     List<ArticlePO> getArticlesByCategoryId(Long categoryId);
 
     void updateCategoryByIds(List<Long> ids, Long categoryId);
+
+    List<ArticlePO> getPublicArticles();
+
+    ArticleVO getPublicArticleByArticleID(Long id);
 }
