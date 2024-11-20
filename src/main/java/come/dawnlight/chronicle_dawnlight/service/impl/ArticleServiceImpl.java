@@ -5,6 +5,7 @@ import come.dawnlight.chronicle_dawnlight.mapper.ArticleMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.PublicArticleVO;
 import come.dawnlight.chronicle_dawnlight.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticlePO> getPublicArticles() {
+    public List<PublicArticleVO> getPublicArticles() {
         return articleMapper.publicArticle();
     }
 

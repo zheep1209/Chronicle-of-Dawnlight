@@ -2,6 +2,7 @@ package come.dawnlight.chronicle_dawnlight.mapper;
 
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.PublicArticleVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -36,7 +37,7 @@ public interface ArticleMapper {
     // 根据文章ID列表，批量修改文件的分类属性
     void updateCategoryIdByIds(@Param("ids") List<Long> ids, @Param("categoryId") Long categoryId);
     // 获取全部公开文章
-    List<ArticlePO> publicArticle();
+    List<PublicArticleVO> publicArticle();
 
     ArticleVO publicArticleByArticleID(Long id);
 }

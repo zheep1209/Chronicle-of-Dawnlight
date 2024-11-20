@@ -5,6 +5,7 @@ import come.dawnlight.chronicle_dawnlight.common.utils.BaseContext;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
+import come.dawnlight.chronicle_dawnlight.pojo.vo.PublicArticleVO;
 import come.dawnlight.chronicle_dawnlight.service.ArticleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +106,7 @@ public class ArticleController {
      */
     @GetMapping("/publicArticle")
     public Result getPublicArticle() {
-        List<ArticlePO> articles = articleService.getPublicArticles();
+        List<PublicArticleVO> articles = articleService.getPublicArticles();
         log.info("返回列表：{}", articles);
         return Result.success(articles);
     }

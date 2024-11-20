@@ -28,7 +28,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
-            log.info("请求头 - {}: {}", headerName, request.getHeader(headerName));
+//            log.info("请求头 - {}: {}", headerName, request.getHeader(headerName));
         }
 
         //  TODO 2.判断请求url中是否包含login，如果包含，说明是登录操作，放行
@@ -48,6 +48,11 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
             log.info("获取公开文章，放行...");
             return true;
         }
+        if (requestURL.contains("/getTouhouUrl")) {
+            log.info("获取图片，放行...");
+            return true;
+        }
+
 
         //  TODO 3.获取请求头中的令牌（token）
         String token = request.getHeader("Authorization");
