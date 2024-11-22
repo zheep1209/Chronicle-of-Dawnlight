@@ -89,13 +89,13 @@
                u.avatar,
                (SELECT COUNT(*) FROM article a WHERE a.user_id = u.id) AS articleCount,
                (SELECT COUNT(DISTINCT c.id)
-                FROM categories c
+                FROM article_categories c
                 WHERE c.user_id = u.id)                                AS categoryCount,
                a.title,
                a.content,
                a.created_at,
                a.updated_at
-        FROM user u
+        FROM users u
                  INNER JOIN
              article a ON u.id = a.user_id
         WHERE a.is_private = 0

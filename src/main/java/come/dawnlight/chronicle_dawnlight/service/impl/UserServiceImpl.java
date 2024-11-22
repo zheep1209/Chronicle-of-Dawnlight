@@ -6,8 +6,10 @@ import come.dawnlight.chronicle_dawnlight.common.Status;
 import come.dawnlight.chronicle_dawnlight.common.exception.BaseException;
 import come.dawnlight.chronicle_dawnlight.common.utils.RedisUtil;
 import come.dawnlight.chronicle_dawnlight.mapper.RoleMapper;
+import come.dawnlight.chronicle_dawnlight.mapper.TransactionCategoryMapper;
 import come.dawnlight.chronicle_dawnlight.mapper.UserMapper;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.UserDTO;
+import come.dawnlight.chronicle_dawnlight.pojo.po.TransactionCategoryPO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.UserPO;
 import come.dawnlight.chronicle_dawnlight.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static come.dawnlight.chronicle_dawnlight.common.utils.ValidationUtil.*;
 
@@ -30,6 +35,8 @@ public class UserServiceImpl implements UserService {
     RoleMapper roleMapper;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    TransactionCategoryMapper transactionCategoryMapper;
     @Autowired
     private RedisUtil redisUtil;
 
@@ -43,8 +50,7 @@ public class UserServiceImpl implements UserService {
         // 校验用户名是否重复
         UserPO temp = new UserPO();
         temp.setUsername(userDTO.getUsername());
-        if (userMapper.select(temp)!=null)
-            throw new BaseException("用户名"+userDTO.getUsername()+"重复");
+        if (userMapper.select(temp) != null) throw new BaseException("用户名" + userDTO.getUsername() + "重复");
         // 校验邮箱
         if (!isValidEmail(userDTO.getEmail())) {
             throw new BaseException("无效的邮箱格式.");
@@ -52,8 +58,7 @@ public class UserServiceImpl implements UserService {
         // 校验邮箱是否重复
         temp = new UserPO();
         temp.setUsername(userDTO.getEmail());
-        if (userMapper.select(temp)!=null)
-            throw new BaseException("该邮箱已注册");
+        if (userMapper.select(temp) != null) throw new BaseException("该邮箱已注册");
 
         // 校验密码
         if (!isValidPassword(userDTO.getPassword())) {
@@ -69,7 +74,8 @@ public class UserServiceImpl implements UserService {
         UserPO userPO = new UserPO();
         BeanUtils.copyProperties(userDTO, userPO);
 //        UUID
-        userPO.setId(UUID.randomUUID().toString());
+        String userId = UUID.randomUUID().toString();
+        userPO.setId(userId);
 //        默认头像
         userPO.setAvatar("https://img.picgo.net/2024/10/25/d693c6f605470263c9e42740e8bed7d2909387c156c4a646.png");
 //        密码加密
@@ -83,6 +89,15 @@ public class UserServiceImpl implements UserService {
 //        修改时间
         userPO.setUpdatedAt(LocalDateTime.now());
         log.info("Registering user: {}", userPO);
+//        创建默认账单分类
+        List<String> defaultCategories = Arrays.asList("餐饮", "交通", "娱乐", "医疗", "其他");
+        List<TransactionCategoryPO> categories = defaultCategories.stream().map(name -> {
+            TransactionCategoryPO category = new TransactionCategoryPO();
+            category.setUserId(userId);
+            category.setName(name);
+            return category;
+        }).collect(Collectors.toList());
+        transactionCategoryMapper.batchInsert(categories);
         return userMapper.registerUser(userPO);
     }
 
@@ -92,16 +107,16 @@ public class UserServiceImpl implements UserService {
         if (loginResult == null) {
             log.info("用户名或密码错误");
             return Result.error("用户名或密码错误");
-        }else {
+        } else {
             log.info("登陆成功");
             return Result.success(loginResult);
         }
     }
 
     @Override
-    public Result loginByEmail(String identifier,String code) throws BaseException {
-        String result =  userMapper.selectByEmail(identifier);
-        if (result == null || result.isEmpty()){
+    public Result loginByEmail(String identifier, String code) throws BaseException {
+        String result = userMapper.selectByEmail(identifier);
+        if (result == null || result.isEmpty()) {
             return Result.error("该邮箱暂未注册");
         }
         // 校验验证码
@@ -113,32 +128,34 @@ public class UserServiceImpl implements UserService {
         }
         return Result.success(result);
     }
+
     //修改头像
     @Override
-    public void updateAvatar(String id,String avatar) {
+    public void updateAvatar(String id, String avatar) {
         UserPO userPO = new UserPO();
         userPO.setId(id);
         userPO.setAvatar(avatar);
         userPO.setUpdatedAt(LocalDateTime.now());
         userMapper.update(userPO);
     }
+
     //修改用户名
     @Override
-    public void updateUserName(String id,String username) throws BaseException {
+    public void updateUserName(String id, String username) throws BaseException {
         // 校验用户名是否重复
         UserPO temp = new UserPO();
         temp.setUsername(username);
-        if (userMapper.select(temp)!=null)
-            throw new BaseException("用户名"+username+"重复");
+        if (userMapper.select(temp) != null) throw new BaseException("用户名" + username + "重复");
         UserPO userPO = new UserPO();
         userPO.setId(id);
         userPO.setUsername(username);
         userPO.setUpdatedAt(LocalDateTime.now());
         userMapper.update(userPO);
     }
+
     //修改密码
     @Override
-    public void updatePassward(String id,String password,String code) throws BaseException {
+    public void updatePassward(String id, String password, String code) throws BaseException {
         // 校验验证码
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");
@@ -155,7 +172,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result getUser(UUID currentThreadId) {
-        log.info("用户信息{}",userMapper.getUser(currentThreadId.toString()));
+        log.info("用户信息{}", userMapper.getUser(currentThreadId.toString()));
         return Result.success(userMapper.getUser(currentThreadId.toString()));
     }
 }

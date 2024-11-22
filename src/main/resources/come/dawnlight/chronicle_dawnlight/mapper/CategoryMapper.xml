@@ -5,25 +5,25 @@
 
     <!-- 插入分类 -->
     <insert id="insert" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.CategoryPO">
-        INSERT INTO categories (name, user_id, created_at, updated_at)
+        INSERT INTO article_categories (name, user_id, created_at, updated_at)
         VALUES (#{name}, #{userId}, NOW(), NOW())
     </insert>
 
     <!-- 更新分类 -->
     <update id="update" parameterType="come.dawnlight.chronicle_dawnlight.pojo.po.CategoryPO">
-        UPDATE categories
+        UPDATE article_categories
         SET name = #{name}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 
     <!-- 删除分类 -->
     <delete id="delete" parameterType="Long">
-        DELETE FROM categories WHERE id = #{id}
+        DELETE FROM article_categories WHERE id = #{id}
     </delete>
 
     <!-- 根据用户 ID 查询分类 -->
     <select id="selectByUserId" resultType="come.dawnlight.chronicle_dawnlight.pojo.po.CategoryPO">
-        SELECT * FROM categories WHERE user_id = #{userId}
+        SELECT * FROM article_categories WHERE user_id = #{userId}
     </select>
 
 </mapper>

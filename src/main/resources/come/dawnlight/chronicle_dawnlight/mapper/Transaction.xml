@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace = "come.dawnlight.chronicle_dawnlight.mapper.TransactionMapper">
+    <insert id="create">
+        INSERT INTO transactions (id, user_id, amount, category_id, type, description, date, created_at, updated_at)
+        VALUES (#{id}, #{userId}, #{amount}, #{categoryId}, #{type}, #{description}, #{date}, NOW(), NOW())
+    </insert>
+    <update id="update">
+        UPDATE transactions
+        SET amount = #{amount},
+            category_id = (select category_id from article_categories where name = #{categoryName}),
+            type = #{type},
+            description = #{description},
+            date = #{date},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+    <select id="get" resultType="come.dawnlight.chronicle_dawnlight.pojo.vo.TransactionVO">
+        SELECT t.id, t.amount, t.type, t.description, t.date, c.name as category
+        FROM transactions t
+        LEFT JOIN transaction_categories c ON t.category_id = c.id
+        WHERE t.id = #{id}
+    </select>
+    <delete id="delete">
+        DELETE FROM transactions WHERE id = #{id}
+    </delete>
+</mapper>
