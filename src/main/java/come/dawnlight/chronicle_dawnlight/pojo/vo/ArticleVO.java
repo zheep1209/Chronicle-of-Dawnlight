@@ -18,5 +18,4 @@ public class ArticleVO {
     private String content;             // 文章内容
     private LocalDateTime createdAt;    // 创建时间
     private LocalDateTime updatedAt;    // 更新时间
-
 }

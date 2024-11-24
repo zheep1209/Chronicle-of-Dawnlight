@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
 //        格式校验
         // 校验用户名
         if (!isValidUsername(userDTO.getUsername())) {
-            throw new BaseException("无效的用户名。用户名必须是3-20个字符，且只能包含字母、数字、下划线和短横线。");
+            throw new BaseException("无效的用户名，用户名必须是3-20个字符，且只能包含字母、数字、下划线和短横线。");
         }
         // 校验用户名是否重复
         UserPO temp = new UserPO();

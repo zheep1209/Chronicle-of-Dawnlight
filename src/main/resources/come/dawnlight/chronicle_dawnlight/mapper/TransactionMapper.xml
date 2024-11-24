@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace = "come.dawnlight.chronicle_dawnlight.mapper.TransactionMapper">
+    <insert id = "create">
+        INSERT INTO transactions (id, user_id, amount, category_id, type, description, date, created_at, updated_at)
+        VALUES (#{id}, #{userId}, #{amount}, #{categoryId}, #{type}, #{description}, #{date}, NOW(), NOW())
+    </insert>
+    <update id = "update">
+        UPDATE transactions
+        SET type        = #{transactionPO.type},
+            category_id = #{transactionPO.categoryId},
+            amount      = #{transactionPO.amount},
+            description = #{transactionPO.description},
+            date        = #{transactionPO.date},
+            updated_at  = NOW()
+        WHERE id = #{transactionPO.id}
+    </update>
+    <select id = "get" resultType = "come.dawnlight.chronicle_dawnlight.pojo.vo.TransactionVO">
+        SELECT t.id, t.amount, t.type, t.description, t.date, c.name as category
+        FROM transactions t
+                 LEFT JOIN transaction_categories c ON t.category_id = c.id
+        WHERE t.id = #{id}
+    </select>
+    <delete id = "delete">
+        DELETE
+        FROM transactions
+        WHERE id = #{id}
+    </delete>
+    <select id = "getTransactionsDay" parameterType = "map" resultType = "map">
+        SELECT t.id,
+               t.amount,
+               t.type,
+               t.description,
+               t.date,
+               (select transaction_categories.name as category
+                from transaction_categories
+                where t.category_id = transaction_categories.id) as category
+        FROM transactions t
+        WHERE t.user_id = #{userId}
+          AND DATE(t.date) = #{date}
+    </select>
+    <select id = "getCategoryTotalsByDay" resultType = "java.util.Map">
+        SELECT (select transaction_categories.name as category
+                from transaction_categories
+                where category_id = transaction_categories.id) as name,
+               -SUM(amount)                                    AS value
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND DATE(date) = #{date}
+          AND type = 'expense'
+        GROUP BY category_id
+    </select>
+    <select id = "getTotalIncomeDay" parameterType = "map" resultType = "map">
+        SELECT SUM(IF(type = 'income', amount, 0))  AS total_income,
+               SUM(IF(type = 'expense', amount, 0)) AS total_expense,
+               SUM(IF(type = 'income', amount, 0)) +
+               SUM(IF(type = 'expense', amount, 0)) AS total
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND DATE(date) = #{date}
+    </select>
+    <!--    查询当月的每天的收支记录-->
+    <select id = "selectMonthlySummary" parameterType = "map" resultType = "map">
+  <![CDATA[
+        WITH RECURSIVE dates AS (
+            -- 创建一个递归查询，生成当月的所有日期
+            SELECT DATE(#{month}) AS transaction_date
+            UNION
+            SELECT DATE_ADD(transaction_date, INTERVAL 1 DAY)
+            FROM dates
+            WHERE transaction_date < LAST_DAY(#{month}))
+        SELECT d.transaction_date,
+               COALESCE(SUM(IF(t.type = 'income', t.amount, 0)), 0)  AS total_income,
+               COALESCE(SUM(IF(t.type = 'expense', t.amount, 0)), 0) AS total_expense,
+               COALESCE(SUM(IF(t.type = 'income', t.amount, 0)), 0) +
+               COALESCE(SUM(IF(t.type = 'expense', t.amount, 0)), 0) AS net_income
+        FROM dates d
+                 LEFT JOIN transactions t
+                           ON DATE(t.date) = d.transaction_date
+                               AND t.user_id = #{userId}
+                               AND t.date >= #{month}
+                               AND t.date < DATE_ADD(#{month}, INTERVAL 1 MONTH)
+        GROUP BY d.transaction_date
+        ORDER BY d.transaction_date;
+        ]]>
+</select>
+    <!--    查询当月的总收支情况-->
+    <select id = "getTotalIncomeMonth" resultType = "java.util.Map">
+        SELECT SUM(IF(type = 'income', amount, 0))  AS total_income,
+               SUM(IF(type = 'expense', amount, 0)) AS total_expense,
+               SUM(IF(type = 'income', amount, 0)) +
+               SUM(IF(type = 'expense', amount, 0)) AS total
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND MONTH(date) = MONTH(#{month})
+          AND YEAR(date) = YEAR(#{month})
+    </select>
+    <!--    根据分类查询当月的总支出-->
+    <select id = "getCategoryTotalsByMonth" resultType = "java.util.Map">
+        SELECT (SELECT transaction_categories.name
+                FROM transaction_categories
+                WHERE category_id = transaction_categories.id) AS name,
+               SUM(amount)                                     AS value
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND DATE_FORMAT(date, '%Y-%m') = #{month}
+          AND type = 'income'
+        GROUP BY category_id
+    </select>
+
+    <!--    返回的每月的总收支-->
+    <select id = "selectYearlySummary" resultType = "map" parameterType = "map">
+<![CDATA[
+        SELECT YEAR(t.date)                             AS year,
+               MONTH(t.date)                            AS month,
+               SUM(IF(t.type = 'income', t.amount, 0))  AS total_income,
+               SUM(IF(t.type = 'expense', t.amount, 0)) AS total_expense,
+               SUM(IF(t.type = 'income', t.amount, 0)) -
+               SUM(IF(t.type = 'expense', t.amount, 0)) AS income_minus_expense
+        FROM transactions t
+        WHERE t.user_id = #{userId}
+          AND YEAR(t.date) = #{year}
+        GROUP BY YEAR(t.date), MONTH(t.date)
+        ORDER BY YEAR(t.date), MONTH(t.date);
+        ]]>
+</select>
+    <select id = "getTotalIncomeYear" resultType = "java.util.Map">
+        SELECT SUM(IF(type = 'income', amount, 0))                                          AS total_income,
+               SUM(IF(type = 'expense', amount, 0))                                         AS total_expense,
+               (SUM(IF(type = 'income', amount, 0)) + SUM(IF(type = 'expense', amount, 0))) AS total
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND YEAR(date) = #{year}
+    </select>
+</mapper>

@@ -26,11 +26,11 @@ public class CaptchaController {
 
     /**
      * 获取邮箱验证码
-     * @param email
-     * @return
+     * @param email 邮箱
+     * @return 验证码
      */
     @GetMapping("/getEmail")
-    public Result getEmail(@RequestParam String email) throws IOException {
+    public Result<String> getEmail(@RequestParam String email) throws IOException {
 //
         String code = GetCaptcha.generateSixDigitCode();
         redisUtil.set("code", code, 5);
