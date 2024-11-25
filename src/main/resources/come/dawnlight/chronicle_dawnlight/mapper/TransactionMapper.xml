@@ -40,7 +40,7 @@
         WHERE t.user_id = #{userId}
           AND DATE(t.date) = #{date}
     </select>
-    <select id = "getCategoryTotalsByDay" resultType = "java.util.Map">
+    <select id = "getDailyBreakdownExpense" resultType = "java.util.Map">
         SELECT (select transaction_categories.name as category
                 from transaction_categories
                 where category_id = transaction_categories.id) as name,
@@ -49,6 +49,17 @@
         WHERE user_id = #{userId}
           AND DATE(date) = #{date}
           AND type = 'expense'
+        GROUP BY category_id
+    </select>
+    <select id = "getDailyBreakdownIncome" resultType = "java.util.Map">
+        SELECT (select transaction_categories.name as category
+                from transaction_categories
+                where category_id = transaction_categories.id) as name,
+               SUM(amount)                                     AS value
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND DATE(date) = #{date}
+          AND type = 'income'
         GROUP BY category_id
     </select>
     <select id = "getTotalIncomeDay" parameterType = "map" resultType = "map">
@@ -87,26 +98,46 @@
 </select>
     <!--    查询当月的总收支情况-->
     <select id = "getTotalIncomeMonth" resultType = "java.util.Map">
-        SELECT SUM(IF(type = 'income', amount, 0))  AS total_income,
-               SUM(IF(type = 'expense', amount, 0)) AS total_expense,
-               SUM(IF(type = 'income', amount, 0)) +
-               SUM(IF(type = 'expense', amount, 0)) AS total
+        SELECT
+            SUM(IF(type = 'income', amount, 0)) AS total_income,
+            SUM(IF(type = 'expense', amount, 0)) AS total_expense,
+            SUM(IF(type = 'income', amount, 0)) + SUM(IF(type = 'expense', amount, 0)) AS total,
+            -(SELECT MAX(amount) FROM transactions WHERE type = 'expense' AND user_id = #{userId} AND MONTH(date) = MONTH(#{month}) AND YEAR(date) = YEAR(#{month}) LIMIT 1) AS min_expense,
+            -(SELECT MIN(amount) FROM transactions WHERE type = 'expense' AND user_id = #{userId} AND MONTH(date) = MONTH(#{month}) AND YEAR(date) = YEAR(#{month}) LIMIT 1) AS max_expense
         FROM transactions
         WHERE user_id = #{userId}
           AND MONTH(date) = MONTH(#{month})
-          AND YEAR(date) = YEAR(#{month})
+          AND YEAR(date) = YEAR(#{month});
     </select>
     <!--    根据分类查询当月的总支出-->
-    <select id = "getCategoryTotalsByMonth" resultType = "java.util.Map">
+    <select id = "getMonthlyBreakdownExpense" resultType = "java.util.Map">
+ <![CDATA[
+        SELECT (SELECT transaction_categories.name
+                FROM transaction_categories
+                WHERE category_id = transaction_categories.id) AS name,
+               -SUM(amount)                                    AS value
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND date >= #{month}
+          AND date < DATE_ADD(#{month}, INTERVAL 1 MONTH)
+          AND type = 'expense'
+        GROUP BY category_id
+        ]]>
+    </select>
+    <!--    根据分类查询当月的总收入-->
+    <select id = "getMonthlyBreakdownIncome" resultType = "java.util.Map">
+ <![CDATA[
         SELECT (SELECT transaction_categories.name
                 FROM transaction_categories
                 WHERE category_id = transaction_categories.id) AS name,
                SUM(amount)                                     AS value
         FROM transactions
         WHERE user_id = #{userId}
-          AND DATE_FORMAT(date, '%Y-%m') = #{month}
+          AND date >= #{month}
+          AND date < DATE_ADD(#{month}, INTERVAL 1 MONTH)
           AND type = 'income'
         GROUP BY category_id
+        ]]>
     </select>
 
     <!--    返回的每月的总收支-->

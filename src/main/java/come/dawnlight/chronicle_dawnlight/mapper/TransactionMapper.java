@@ -30,7 +30,10 @@ public interface TransactionMapper {
 
     //根据分类获取当日全部收入
     @MapKey("id")
-    List<Map<String, Object>> getCategoryTotalsByDay(@Param("userId") String userId, @Param("date") LocalDate date);
+    List<Map<String, Object>> getDailyBreakdownExpense(@Param("userId") String userId, @Param("date") LocalDate date);
+    //根据分类获取当日全部支出
+    @MapKey("id")
+    List<Map<String, Object>> getDailyBreakdownIncome(@Param("userId") String userId, @Param("date") LocalDate date);
 
     //获取当月全部交易数据
     @MapKey("id")
@@ -39,8 +42,12 @@ public interface TransactionMapper {
     //获取当月全部总收支和收支差
     Map<String, Object> getTotalIncomeMonth(@Param("userId") String userId, @Param("month") Date targetMonth);
 
+    //根据分类获取当月全部支出
+    @MapKey("name")
+    List<Map<String, Object>> getMonthlyBreakdownExpense(@Param("userId") String userId, @Param("month") Date targetMonth);
     //根据分类获取当月全部收入
-    Map<String, Object> getCategoryTotalsByMonth(@Param("userId") String userId, @Param("month") Date targetMonth);
+    @MapKey("name")
+    List<Map<String, Object>> getMonthlyBreakdownIncome(@Param("userId") String userId, @Param("month") Date targetMonth);
 
     //返回的每月的总收支
     @MapKey("id")

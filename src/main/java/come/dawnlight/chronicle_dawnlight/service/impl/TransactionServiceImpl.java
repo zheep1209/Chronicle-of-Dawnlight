@@ -70,8 +70,12 @@ public class TransactionServiceImpl implements TransactionService {
         result.put("total", totals);
         List<Map<String, Object>> transactions = transactionMapper.getTransactionsDay(BaseContext.getCurrentThreadId().toString(), targetDate);
         result.put("trList", transactions);
-        List<Map<String, Object>> categoryTotals = transactionMapper.getCategoryTotalsByDay(BaseContext.getCurrentThreadId().toString(), targetDate);
-        result.put("categoryTotals", categoryTotals);
+        Map<String, Object> breakdown = new HashMap<>();
+        List<Map<String, Object>> expense = transactionMapper.getDailyBreakdownExpense(BaseContext.getCurrentThreadId().toString(), targetDate);
+        breakdown.put("expense", expense);
+        List<Map<String, Object>> income = transactionMapper.getDailyBreakdownIncome(BaseContext.getCurrentThreadId().toString(), targetDate);
+        breakdown.put("income", income);
+        result.put("breakdown", breakdown);
         return result;
     }
 
@@ -85,9 +89,12 @@ public class TransactionServiceImpl implements TransactionService {
         result.put("total", totals);
         List<Map<String, Object>> transactions = transactionMapper.selectMonthlySummary(BaseContext.getCurrentThreadId().toString(), date);
         result.put("trList", transactions);
-        Map<String, Object> categoryTotals = transactionMapper.getCategoryTotalsByMonth(BaseContext.getCurrentThreadId().toString(), date);
-        result.put("categoryTotals", categoryTotals);
-        log.info("month{}", result);
+        Map<String, Object> breakdown = new HashMap<>();
+        List<Map<String, Object>> expense = transactionMapper.getMonthlyBreakdownExpense(BaseContext.getCurrentThreadId().toString(), date);
+        breakdown.put("expense", expense);
+        List<Map<String, Object>> income = transactionMapper.getMonthlyBreakdownIncome(BaseContext.getCurrentThreadId().toString(), date);
+        breakdown.put("income", income);
+        result.put("breakdown", breakdown);
         return result;
     }
 
@@ -100,7 +107,7 @@ public class TransactionServiceImpl implements TransactionService {
         result.put("total", totalIncomeYear);
         //每月的收支差
         List<Map<String, Object>> monthsTotal = transactionMapper.selectYearlySummary(BaseContext.getCurrentThreadId().toString(), year);
-        result.put("months-total", monthsTotal);
+        result.put("monthsTotal", monthsTotal);
         List<Date> monthsList = new ArrayList<>();
         monthsTotal.forEach(item -> {
             try {
