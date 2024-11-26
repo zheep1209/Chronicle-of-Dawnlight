@@ -64,11 +64,13 @@ public class UserServiceImpl implements UserService {
         if (!isValidPassword(userDTO.getPassword())) {
             throw new BaseException("无效的密码。密码必须是6-20个字符。");
         }
+        log.info("Registering user: {}", userDTO);
+        log.info("code: {}", redisUtil.get(userDTO.getEmail() + "code"));
         // 校验验证码
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");
         }
-        if (!code.equals(redisUtil.get("code"))) {
+        if (!code.equals(redisUtil.get(userDTO.getEmail()+"code"))) {
             throw new BaseException("验证码错误");
         }
         UserPO userPO = new UserPO();
@@ -123,7 +125,7 @@ public class UserServiceImpl implements UserService {
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");
         }
-        if (!code.equals(redisUtil.get("code"))) {
+        if (!code.equals(redisUtil.get(identifier+"code"))) {
             throw new BaseException("验证码错误");
         }
         return Result.success(result);

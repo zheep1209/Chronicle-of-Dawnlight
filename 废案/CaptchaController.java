@@ -1,7 +1,6 @@
 package come.dawnlight.chronicle_dawnlight.controller;
 
 import come.dawnlight.chronicle_dawnlight.common.Result;
-import come.dawnlight.chronicle_dawnlight.common.exception.BaseException;
 import come.dawnlight.chronicle_dawnlight.common.utils.GetCaptcha;
 import come.dawnlight.chronicle_dawnlight.common.utils.HttpClientUtils;
 import come.dawnlight.chronicle_dawnlight.common.utils.RedisUtil;

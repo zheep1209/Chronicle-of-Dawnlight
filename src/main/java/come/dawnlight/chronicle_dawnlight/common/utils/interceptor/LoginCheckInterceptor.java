@@ -44,6 +44,10 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
             log.info("获取验证码，放行...");
             return true;
         }
+        if (requestURL.contains("/sendMailCaptcha")) {
+            log.info("获取验证码，放行...");
+            return true;
+        }
         if (requestURL.contains("/publicArticle")) {
             log.info("获取公开文章，放行...");
             return true;

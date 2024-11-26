@@ -14,11 +14,14 @@ public class ToolsController {
     private ToolsService toolsService;
 
     /**
-     * 获取随机东方Project图片
+     * 获取随机东方Project    图片
      * @return
      */
     @GetMapping("/getTouhouUrl")
     public Result createArticle() {
         return Result.success(toolsService.getTouhouUrl());
     }
+    /**
+     * 将数据返回为excel格式
+     */
 }

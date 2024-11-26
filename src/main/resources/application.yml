@@ -8,7 +8,29 @@ spring:
     host: localhost
     port: 6379
     #设置项目访问根路径
+    #邮箱基本配置
+  mail:
+    host: smtp.qq.com
+    username: zheep1209@foxmail.com
+    password: ajqslorgfadtbich
+    port: 465
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# 服务端口
+server:
+  port: 8080
