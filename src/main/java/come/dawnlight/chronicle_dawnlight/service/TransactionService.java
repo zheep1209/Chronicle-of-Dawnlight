@@ -25,5 +25,5 @@ public interface TransactionService {
     Map<String, Object> getMonthlySummary(String targetMonth) throws ParseException;
 
     // 按年查询每年汇总
-    Map<String, Object> getYearlySummary(int year);
+    Map<String, Object> getYearlySummary(int year) throws ParseException;
 }

@@ -99,26 +99,43 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Map<String, Object> getYearlySummary(int year) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public Map<String, Object> getYearlySummary(int year) throws ParseException {
         Map<String, Object> result = new HashMap<>();
         //获取当年全部收支和收支差
         Map<String, Object> totalIncomeYear = transactionMapper.getTotalIncomeYear(BaseContext.getCurrentThreadId().toString(), year);
         result.put("total", totalIncomeYear);
         //每月的收支差
-        List<Map<String, Object>> monthsTotal = transactionMapper.selectYearlySummary(BaseContext.getCurrentThreadId().toString(), year);
+        List<Map<String, Object>> monthsTotal = transactionMapper.totalMonthlyIncomeExpenditure(BaseContext.getCurrentThreadId().toString(), year);
         result.put("monthsTotal", monthsTotal);
-        List<Date> monthsList = new ArrayList<>();
-        monthsTotal.forEach(item -> {
-            try {
-                monthsList.add(sdf.parse(item.get("year") + "-" + item.get("month").toString() + "-01"));
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
-        });
+
+        // 初始化日期格式化器和存储结果的集合
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<List<Map<String, Object>>> transactions = new ArrayList<>();
-        monthsList.forEach(item -> transactions.add(transactionMapper.selectMonthlySummary(BaseContext.getCurrentThreadId().toString(), item)));
-        result.put("months", transactions);
+
+        // 获取当前年份
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+        // 循环生成每月的日期并查询数据
+        for (int i = 1; i <= 12; i++) {
+            // 格式化月份为两位数，例如 "01"
+            String targetDate = currentYear + "-" + String.format("%02d", i) + "-01";
+
+            // 将字符串解析为日期对象
+            Date date = sdf.parse(targetDate);
+
+            // 调用数据库查询方法，假设 BaseConxtext 提供用户 ID
+            List<Map<String, Object>> maps = transactionMapper.selectMonthlySummary(BaseContext.getCurrentThreadId().toString(), date);
+
+            // 将结果添加到总集合
+            transactions.add(maps);
+            result.put("months", transactions);
+        }
+        Map<String, Object> breakdown = new HashMap<>();
+        List<Map<String, Object>> expense = transactionMapper.getYearlyBreakdownExpense(BaseContext.getCurrentThreadId().toString(), year);
+        breakdown.put("expense", expense);
+        List<Map<String, Object>> income = transactionMapper.getYearlyBreakdownIncome(BaseContext.getCurrentThreadId().toString(), year);
+        breakdown.put("income", income);
+        result.put("breakdown", breakdown);
         return result;
     }
 }

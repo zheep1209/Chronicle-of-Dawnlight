@@ -139,23 +139,30 @@
         GROUP BY category_id
         ]]>
     </select>
-
     <!--    返回的每月的总收支-->
-    <select id = "selectYearlySummary" resultType = "map" parameterType = "map">
+    <select id = "totalMonthlyIncomeExpenditure" resultType = "map" parameterType = "map">
 <![CDATA[
-        SELECT YEAR(t.date)                             AS year,
-               MONTH(t.date)                            AS month,
-               SUM(IF(t.type = 'income', t.amount, 0))  AS total_income,
-               SUM(IF(t.type = 'expense', t.amount, 0)) AS total_expense,
-               SUM(IF(t.type = 'income', t.amount, 0)) -
-               SUM(IF(t.type = 'expense', t.amount, 0)) AS income_minus_expense
-        FROM transactions t
-        WHERE t.user_id = #{userId}
-          AND YEAR(t.date) = #{year}
-        GROUP BY YEAR(t.date), MONTH(t.date)
-        ORDER BY YEAR(t.date), MONTH(t.date);
+        WITH RECURSIVE months AS (
+            SELECT 1 AS month
+            UNION ALL
+            SELECT month + 1
+            FROM months
+            WHERE month < 12
+        )
+        SELECT
+            #{year} AS year,
+            m.month,
+            COALESCE(SUM(IF(t.type = 'income', t.amount, 0)), 0) AS total_income,
+            COALESCE(SUM(IF(t.type = 'expense', t.amount, 0)), 0) AS total_expense,
+            COALESCE(SUM(IF(t.type = 'income', t.amount, 0)), 0) -
+            COALESCE(SUM(IF(t.type = 'expense', t.amount, 0)), 0) AS income_minus_expense
+        FROM months m
+                 LEFT JOIN transactions t ON m.month = MONTH(t.date) AND t.user_id = #{userId} AND YEAR(t.date) = #{year}
+        GROUP BY m.month
+        ORDER BY m.month;
         ]]>
 </select>
+    <!--    年总收支-->
     <select id = "getTotalIncomeYear" resultType = "java.util.Map">
         SELECT SUM(IF(type = 'income', amount, 0))                                          AS total_income,
                SUM(IF(type = 'expense', amount, 0))                                         AS total_expense,
@@ -163,5 +170,27 @@
         FROM transactions
         WHERE user_id = #{userId}
           AND YEAR(date) = #{year}
+    </select>
+    <select id="getYearlyBreakdownExpense" resultType="java.util.Map">
+        SELECT (SELECT transaction_categories.name
+                FROM transaction_categories
+                WHERE category_id = transaction_categories.id) AS name,
+               -SUM(amount)                                    AS value
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND YEAR(date) = #{year}
+          AND type = 'expense'
+        GROUP BY category_id
+    </select>
+    <select id="getYearlyBreakdownIncome" resultType="java.util.Map">
+        SELECT (SELECT transaction_categories.name
+                FROM transaction_categories
+                WHERE category_id = transaction_categories.id) AS name,
+               SUM(amount)                                     AS value
+        FROM transactions
+        WHERE user_id = #{userId}
+          AND YEAR(date) = #{year}
+          AND type = 'income'
+        GROUP BY category_id
     </select>
 </mapper>

@@ -51,10 +51,17 @@ public interface TransactionMapper {
 
     //返回的每月的总收支
     @MapKey("id")
-    List<Map<String, Object>> selectYearlySummary(@Param("userId") String userId, @Param("year") int year);
+    List<Map<String, Object>> totalMonthlyIncomeExpenditure(@Param("userId") String userId, @Param("year") int year);
 
     //获取当年全部收支和收支差
     Map<String, Object> getTotalIncomeYear(@Param("userId") String userId, @Param("year") int year);
+    //根据分类获取当年全部支出
+    @MapKey("name")
+    List<Map<String, Object>> getYearlyBreakdownExpense(@Param("userId") String userId, @Param("year") int year);
+    //根据分类获取当年全部收入
+    @MapKey("name")
+    List<Map<String, Object>> getYearlyBreakdownIncome(@Param("userId") String userId, @Param("year") int year);
+
 }
 
 

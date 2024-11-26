@@ -89,7 +89,7 @@ public class TransactionController {
      * @return
      */
     @GetMapping("/yearly")
-    public Result<Map<String, Object>> getYearlySummary(@RequestParam("year") int year) {
+    public Result<Map<String, Object>> getYearlySummary(@RequestParam("year") int year) throws ParseException {
         Map<String, Object> yearlySummary = transactionService.getYearlySummary(year);
         return Result.success(yearlySummary);
     }
