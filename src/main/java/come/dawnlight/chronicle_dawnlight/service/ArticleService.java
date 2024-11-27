@@ -1,5 +1,6 @@
 package come.dawnlight.chronicle_dawnlight.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
 import come.dawnlight.chronicle_dawnlight.pojo.po.ArticlePO;
 import come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO;
@@ -16,7 +17,7 @@ public interface ArticleService {
 
     void deleteArticles(List<Long> ids, String userID);
 
-    List<ArticlePO> getArticlesByUser(String username);
+    List<ArticlePO> getArticlesByUser(String username) throws JsonProcessingException;
 
     List<ArticlePO> getArticlesByUserAndCategory(String userId, Long categoryId);
 

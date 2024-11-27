@@ -44,7 +44,8 @@
         SELECT *
         FROM article
         WHERE user_id = #{userId}
-          AND category_id = #{categoryId}
+        <if test = "categoryId==-1">AND category_id IS NULL</if>
+        <if test = "categoryId!=-1">AND category_id = #{categoryId}</if>
         ORDER BY created_at DESC;
     </select>
 
@@ -56,10 +57,10 @@
     <update id = "updateCategoryIdByIds">
         UPDATE article
         SET category_id =
-        <if test = "categoryId != null">
+        <if test = "categoryId != -1">
             #{categoryId}
         </if>
-        <if test = "categoryId == null">
+        <if test = "categoryId == -1">
             NULL
         </if>
         WHERE id IN
@@ -67,20 +68,15 @@
             #{id}
         </foreach>
     </update>
-    <select id="publicArticle" resultType="come.dawnlight.chronicle_dawnlight.pojo.vo.PublicArticleVO">
-    select a.*, t.C1 as touhou_url
-    from (
-        select *, row_number() over (order by updated_at desc) as rn
-        from chronicle_dawnlight.article
-        where is_private = 0
-    ) a
-    left join (
-        select C1, row_number() over (order by rand()) as rn
-        from touhouproject_wallpaper_url
-    ) t on a.rn = t.rn
-    ORDER BY a.updated_at DESC;
-</select>
-
+    <select id = "publicArticle" resultType = "come.dawnlight.chronicle_dawnlight.pojo.vo.PublicArticleVO">
+        select a.*, t.C1 as touhou_url
+        from (select *, row_number() over (order by updated_at desc) as rn
+              from chronicle_dawnlight.article
+              where is_private = 0) a
+                 left join (select C1, row_number() over (order by rand()) as rn
+                            from touhouproject_wallpaper_url) t on a.rn = t.rn
+        ORDER BY a.updated_at DESC;
+    </select>
 
     <select id = "publicArticleByArticleID"
             resultType = "come.dawnlight.chronicle_dawnlight.pojo.vo.ArticleVO">

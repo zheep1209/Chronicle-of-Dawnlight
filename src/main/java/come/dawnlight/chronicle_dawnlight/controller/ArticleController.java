@@ -1,5 +1,6 @@
 package come.dawnlight.chronicle_dawnlight.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import come.dawnlight.chronicle_dawnlight.common.Result;
 import come.dawnlight.chronicle_dawnlight.common.utils.BaseContext;
 import come.dawnlight.chronicle_dawnlight.pojo.dto.ArticleDTO;
@@ -56,6 +57,7 @@ public class ArticleController {
      */
     @GetMapping("/byUserAndCategory")
     public Result getArticlesByUserAndCategory(@RequestParam Long categoryId) {
+        log.info("查询文章列表{}", categoryId);
         String userID = BaseContext.getCurrentThreadId().toString();
         List<ArticlePO> articles = articleService.getArticlesByUserAndCategory(userID, categoryId);
         return Result.success(articles);
@@ -80,7 +82,7 @@ public class ArticleController {
      * @return
      */
     @GetMapping("/article/list")
-    public Result listArticles() {
+    public Result listArticles() throws JsonProcessingException {
         String userID = BaseContext.getCurrentThreadId().toString();
         List<ArticlePO> articles = articleService.getArticlesByUser(userID);
         return Result.success(articles);

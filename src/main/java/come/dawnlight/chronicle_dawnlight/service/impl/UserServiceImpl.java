@@ -1,5 +1,5 @@
 package come.dawnlight.chronicle_dawnlight.service.impl;
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import come.dawnlight.chronicle_dawnlight.common.Result;
 import come.dawnlight.chronicle_dawnlight.common.Role;
 import come.dawnlight.chronicle_dawnlight.common.Status;
@@ -26,7 +26,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static come.dawnlight.chronicle_dawnlight.common.utils.ValidationUtil.*;
-
 
 @Service
 @Slf4j
@@ -64,13 +63,17 @@ public class UserServiceImpl implements UserService {
         if (!isValidPassword(userDTO.getPassword())) {
             throw new BaseException("无效的密码。密码必须是6-20个字符。");
         }
-        log.info("Registering user: {}", userDTO);
-        log.info("code: {}", redisUtil.get(userDTO.getEmail() + "code"));
+//        log.info("Registering user: {}", userDTO);
+        TypeReference<String> typeReference = new TypeReference<String>() {};
+//        log.info("code: {}", redisUtil.get(userDTO.getEmail() + "code",typeReference));
         // 校验验证码
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");
         }
-        if (!code.equals(redisUtil.get(userDTO.getEmail()+"code"))) {
+        if (redisUtil.get(userDTO.getEmail()+"code",typeReference) == null){
+            throw new BaseException("验证码已过期");
+        }
+        if (!code.equals(redisUtil.get(userDTO.getEmail()+"code",typeReference))) {
             throw new BaseException("验证码错误");
         }
         UserPO userPO = new UserPO();
@@ -117,6 +120,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result loginByEmail(String identifier, String code) throws BaseException {
+        TypeReference<String> typeReference = new TypeReference<String>() {};
         String result = userMapper.selectByEmail(identifier);
         if (result == null || result.isEmpty()) {
             return Result.error("该邮箱暂未注册");
@@ -125,7 +129,10 @@ public class UserServiceImpl implements UserService {
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");
         }
-        if (!code.equals(redisUtil.get(identifier+"code"))) {
+        if (redisUtil.get(identifier+"code",typeReference) == null){
+            throw new BaseException("验证码已过期");
+        }
+        if (!code.equals(redisUtil.get(identifier+"code",typeReference))) {
             throw new BaseException("验证码错误");
         }
         return Result.success(result);
@@ -158,11 +165,12 @@ public class UserServiceImpl implements UserService {
     //修改密码
     @Override
     public void updatePassward(String id, String password, String code) throws BaseException {
+        TypeReference<String> typeReference = new TypeReference<String>() {};
         // 校验验证码
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");
         }
-        if (!code.equals(redisUtil.get("code"))) {
+        if (!code.equals(redisUtil.get("code",typeReference))) {
             throw new BaseException("验证码错误");
         }
         UserPO userPO = new UserPO();
