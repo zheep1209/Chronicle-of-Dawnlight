@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.dawnlight.chronicle_dawnlight.mapper.FolderMapper">
+
+<!--    &lt;!&ndash; 创建文件夹 &ndash;&gt;-->
+<!--    <insert id = "createFolder" parameterType = "com.dawnlight.chronicle_dawnlight.pojo.po.FolderPO"-->
+<!--            useGeneratedKeys = "true" keyProperty = "id">-->
+<!--        INSERT INTO folders (user_id, parent_id, name, created_at)-->
+<!--        VALUES (#{userId}, #{parentId}, #{name}, now());-->
+<!--    </insert>-->
+
+    <!-- 获取用户所有文件夹 -->
+
+    <select id = "getFoldersByUserId" parameterType = "String"
+            resultType = "com.dawnlight.chronicle_dawnlight.pojo.po.FolderPO">
+        SELECT *
+        FROM folders
+        WHERE user_id = #{userId};
+    </select>
+
+    <!-- 根据父文件夹ID获取子文件夹 -->
+    <select id = "getSubFoldersByParentId" parameterType = "Integer"
+            resultType = "com.dawnlight.chronicle_dawnlight.pojo.po.FolderPO">
+        SELECT *
+        FROM folders
+        WHERE parent_id = #{parentId};
+    </select>
+    <!-- 根据 ID 获取文件夹信息-->
+    <select id = "getFolderById" resultType = "com.dawnlight.chronicle_dawnlight.pojo.po.FolderPO">
+        SELECT *
+        FROM folders
+        WHERE id = #{id}
+    </select>
+</mapper>

@@ -16,6 +16,13 @@
     </properties>
     <dependencies>
 <!--        -->
+        <!-- https://mvnrepository.com/artifact/eu.bitwalker/UserAgentUtils -->
+        <dependency>
+            <groupId>eu.bitwalker</groupId>
+            <artifactId>UserAgentUtils</artifactId>
+            <version>1.21</version>
+        </dependency>
+<!--        -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
@@ -134,7 +141,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>come.dawnlight.chronicle_dawnlight.ChronicleDawnlightApplication</mainClass>
+                    <mainClass>com.dawnlight.chronicle_dawnlight.ChronicleDawnlightApplication</mainClass>
                     <!--                    <skip>true</skip>-->
                     <fork>true</fork> <!-- 如果没有该配置，devtools不会生效  打包 将外部jar包打包进项目中 -->
                     <includeSystemScope>true</includeSystemScope> <!-- 打包 将外部jar包打包进项目中 -->

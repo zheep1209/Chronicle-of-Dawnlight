@@ -1,9 +1,9 @@
-package come.dawnlight.chronicle_dawnlight.controller;
+package com.dawnlight.chronicle_dawnlight.controller;
 
-import come.dawnlight.chronicle_dawnlight.common.Result;
-import come.dawnlight.chronicle_dawnlight.common.utils.GetCaptcha;
-import come.dawnlight.chronicle_dawnlight.common.utils.HttpClientUtils;
-import come.dawnlight.chronicle_dawnlight.common.utils.RedisUtil;
+import com.dawnlight.chronicle_dawnlight.common.Result;
+import com.dawnlight.chronicle_dawnlight.common.utils.GetCaptcha;
+import com.dawnlight.chronicle_dawnlight.common.utils.HttpClientUtils;
+import com.dawnlight.chronicle_dawnlight.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

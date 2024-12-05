@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dawnlight.chronicle_dawnlight.mapper.FileMapper">
+
+    <!-- 上传文件 -->
+    <insert id="uploadFile" parameterType="com.dawnlight.chronicle_dawnlight.pojo.po.FilePO">
+        INSERT INTO files (user_id, file_name, file_size, file_path, folder_id, upload_time, description)
+        VALUES (#{userId}, #{fileName}, #{fileSize}, #{filePath}, #{folderId}, #{uploadTime}, #{description});
+    </insert>
+
+    <!-- 获取用户所有文件 -->
+    <select id="getFilesByUserId" parameterType="String" resultType="com.dawnlight.chronicle_dawnlight.pojo.po.FilePO">
+        SELECT * FROM files WHERE user_id = #{userId};
+    </select>
+
+    <!-- 获取文件夹内所有文件 -->
+    <select id="getFilesByFolderId" parameterType="Integer" resultType="com.dawnlight.chronicle_dawnlight.pojo.po.FilePO">
+        SELECT * FROM files WHERE folder_id = #{folderId};
+    </select>
+
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dawnlight.chronicle_dawnlight.mapper.RoleMapper">
+
+    <!-- 插入角色 -->
+    <insert id="insertRole" parameterType="com.dawnlight.chronicle_dawnlight.pojo.po.RolePO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO role (name)
+        VALUES (#{name})
+    </insert>
+
+    <!-- 根据ID删除角色 -->
+    <delete id="deleteRoleById" parameterType="int">
+        DELETE FROM role WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询角色 -->
+    <select id="findRoleById" parameterType="int" resultType="com.dawnlight.chronicle_dawnlight.pojo.po.RolePO">
+        SELECT id, name
+        FROM role
+        WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有角色 -->
+    <select id="findAllRoles" resultType="com.dawnlight.chronicle_dawnlight.pojo.po.RolePO">
+        SELECT id, name
+        FROM role
+    </select>
+
+    <!-- 更新角色 -->
+    <update id="updateRole" parameterType="com.dawnlight.chronicle_dawnlight.pojo.po.RolePO">
+        UPDATE role
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

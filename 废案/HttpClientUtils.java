@@ -1,4 +1,4 @@
-package come.dawnlight.chronicle_dawnlight.common.utils;
+package com.dawnlight.chronicle_dawnlight.common.utils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
