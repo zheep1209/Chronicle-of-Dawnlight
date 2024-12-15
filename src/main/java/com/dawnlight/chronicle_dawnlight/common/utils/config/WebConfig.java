@@ -21,14 +21,15 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/login", // 登录接口
                         "/register", // 注册接口
-                        "/getEmail" // 获取邮箱验证码接口,
+                        "/getEmail",// 获取邮箱验证码接口,
+                        "/api"//爬虫接口
                 );
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://www.alba.us.kg","http://localhost:5173", "https://frp-act.top:29659")
+                .allowedOrigins("https://www.alba.us.kg","http://localhost:5173")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowCredentials(true);
     }

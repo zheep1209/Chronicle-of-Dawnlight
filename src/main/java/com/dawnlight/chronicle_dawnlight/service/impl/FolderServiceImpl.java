@@ -11,13 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 @Slf4j
 @Service
 public class FolderServiceImpl implements FolderService {
 
-    // 基础路径
-    private static final String BASE_PATH = "C:\\Users\\zheep\\Documents\\Chronicle_Dawnlight\\uploads\\";
+    // 使用相对路径（相对当前工作目录）
+    private static final String BASE_PATH = "uploads" + File.separator;
+
     @Autowired
     private FolderMapper folderMapper;
     @Autowired
@@ -29,19 +33,26 @@ public class FolderServiceImpl implements FolderService {
         if (folder.getParentId() == null) {
             folder.setName(folder.getUserId());
         }
+        // 使用 Paths 来构建路径
+        Path baseDir = Paths.get(BASE_PATH);
+        if (!Files.exists(baseDir)) {
+            try {
+                Files.createDirectories(baseDir);
+            } catch (IOException e) {
+                throw new RuntimeException("无法创建基础目录: " + BASE_PATH, e);
+            }
+        }
 
-        // 构建文件夹路径
-        String userFolderPath = BASE_PATH + folder.getUserId();
-        String parentFolderPath = folder.getParentId() == null ? "" : File.separator + getParentFolderPath(folder.getParentId());
-        String fullPath = folder.getParentId() == null ? userFolderPath : userFolderPath + parentFolderPath + File.separator + folder.getName();
+        Path userFolderPath = baseDir.resolve(folder.getUserId());
+        Path fullPath = folder.getParentId() == null
+                ? userFolderPath
+                : userFolderPath.resolve(getParentFolderPath(folder.getParentId())).resolve(folder.getName());
 
         // 创建物理文件夹
-        File file = new File(fullPath);
-        if (!file.exists()) {
-            boolean isCreated = file.mkdirs();
-            if (!isCreated) {
-                throw new RuntimeException("无法创建物理文件夹: " + fullPath);
-            }
+        try {
+            Files.createDirectories(fullPath);
+        } catch (IOException e) {
+            throw new RuntimeException("无法创建物理文件夹: " + fullPath, e);
         }
 
         // 创建数据库记录
@@ -49,7 +60,7 @@ public class FolderServiceImpl implements FolderService {
 
         // 获取新插入的文件夹ID
         int folderId = folder.getId();
-        log.info("创建文件夹成功，ID: {}", folderId);
+        log.info("创建文件夹成功，ID: {}, 路径: {}", folderId, fullPath);
 
         return folderId;
     }
@@ -73,30 +84,37 @@ public class FolderServiceImpl implements FolderService {
         if (parentFolder == null) {
             throw new RuntimeException("父级文件夹不存在，ID: " + parentId);
         }
-        return parentFolder.getParentId() == null ? "" : getParentFolderPath(parentFolder.getParentId()) + File.separator + parentFolder.getName();
+        return parentFolder.getParentId() == null ? parentFolder.getName() : getParentFolderPath(parentFolder.getParentId()) + File.separator + parentFolder.getName();
     }
 
     @Override
     public void deleteFolder(Integer folderId) {
-        // 1. 获取文件夹信息并删除该文件夹下的所有文件
         deleteFilesInFolder(folderId);
-
-        // 2. 递归删除所有子文件夹
         deleteSubFolders(folderId);
 
-        // 3. 删除文件夹本身
         FolderPO folder = folderMapper.getFolderById(folderId);
         if (folder == null) {
             throw new RuntimeException("文件夹不存在，ID: " + folderId);
         }
+        Path folderPath = Paths.get(BASE_PATH, folder.getUserId(), getFolderPath(folderId));
+        try {
+            Files.walkFileTree(folderPath, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
 
-        String folderPath = BASE_PATH + folder.getUserId() + File.separator + getFolderPath(folderId);
-        File folderFile = new File(folderPath);
-        if (folderFile.exists()) {
-            deleteDirectory(folderFile); // 删除目录及其内容
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("删除目录失败: " + folderPath, e);
         }
 
-        // 4. 删除数据库中的文件夹记录
         folderMapper.deleteFolderById(folderId);
     }
 
@@ -104,6 +122,11 @@ public class FolderServiceImpl implements FolderService {
      * 递归删除所有子文件夹
      */
     private void deleteSubFolders(Integer folderId) {
+        File uploadsDir = new File(BASE_PATH);
+        if (!uploadsDir.exists()) {
+            uploadsDir.mkdirs(); // 如果文件夹不存在，则创建
+        }
+
         List<FolderPO> subFolders = folderMapper.getSubFoldersByParentId(folderId);
         for (FolderPO subFolder : subFolders) {
             deleteFilesInFolder(subFolder.getId()); // 删除子文件夹下的所有文件

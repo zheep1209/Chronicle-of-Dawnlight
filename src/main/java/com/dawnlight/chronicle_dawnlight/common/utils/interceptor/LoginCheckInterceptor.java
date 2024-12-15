@@ -28,7 +28,6 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
         String ipAddress = RequestInformation.getIpAddress(request);
         log.info("request url:{}", requestURL);
         log.info("浏览器：{}，操作系统：{}，IP地址：{}", string, osName, ipAddress);
-
         //  TODO 2.判断请求url中是否包含login，如果包含，说明是登录操作，放行
         if (requestURL.contains("/login")) {
             //log.info("登录操作，放行...");
@@ -54,12 +53,13 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
             //log.info("获取图片，放行...");
             return true;
         }
-
-
-        //  TODO 3.获取请求头中的令牌（token）
+        if (requestURL.contains("/api")){
+            return true;
+        }
+        //获取请求头中的令牌（token）
         String token = request.getHeader("Authorization");
 
-        //  TODO 4.判断令牌是否存在，如果不存在，返回错误结果（未登录）
+        //判断令牌是否存在，如果不存在，返回错误结果（未登录）
         if (!StringUtils.hasLength(token)) { //spring当中的工具类
 //            说明字符串为null，返回错误结果（未登录）
             log.info("请求头token为空，返回未登录的信息");
@@ -70,7 +70,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
             response.getWriter().write(errorJson);
             return false;
         }
-        //  TODO 5.解析token，如果解析失败，返回错误结果（未登录）
+        //解析token，如果解析失败，返回错误结果（未登录）
 //      说明存在令牌，校验
         Claims claims;
         try {
@@ -89,8 +89,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
         //  TODO 6.放行
         UUID uuid = UUID.fromString(claims.get("id", String.class));
         BaseContext.setCurrentThreadId(uuid);
-        log.info("莫要委身于安静的黄昏，光会消失：{}", uuid);
-//        return HandlerInterceptor.super.preHandle(request, response, handler);
+        log.info("UUID：{}", uuid);
         return true;
     }
 

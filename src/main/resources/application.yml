@@ -1,12 +1,14 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/chronicle_dawnlight
-    username: root
-    password: 104754
+    url: jdbc:mysql:// rm-bp1b808g64ggm02i8no.mysql.rds.aliyuncs.com:3306/chronicle_dawnlight
+    username: zheep
+    password: 15689092595zZ
   redis:
-    host: localhost
-    port: 6379
+    host: redis-11025.c299.asia-northeast1-1.gce.redns.redis-cloud.com
+    port: 11025
+    password: bAujYIfGojPIWyGctbzUG4kELGs7RTtB
+    username: default
     #设置项目访问根路径
     #邮箱基本配置
   mail:

@@ -23,9 +23,6 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserMapper userMapper;
-//    @Autowired
-//    private  JwtUtil jwtUtil;
-
     /**
      * 用户注册
      */
@@ -74,7 +71,12 @@ public class UserController {
         }
     }
 
-    //提取生成Jwt方法
+    /**
+     * 提取生成Jwt方法
+     * @param result .
+     * @param data .
+     * @return .
+     */
     private Result getResult(Result result, Map<String, Object> data) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", result.getData());

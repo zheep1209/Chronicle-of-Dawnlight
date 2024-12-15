@@ -64,9 +64,7 @@ public class UserServiceImpl implements UserService {
         if (!isValidPassword(userDTO.getPassword())) {
             throw new BaseException("无效的密码。密码必须是6-20个字符。");
         }
-//        log.info("Registering user: {}", userDTO);
         TypeReference<String> typeReference = new TypeReference<String>() {};
-//        log.info("code: {}", redisUtil.get(userDTO.getEmail() + "code",typeReference));
         // 校验验证码
         if (code.isEmpty()) {
             throw new BaseException("请输入验证码");

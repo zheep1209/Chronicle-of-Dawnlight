@@ -6,13 +6,16 @@ import com.dawnlight.chronicle_dawnlight.pojo.po.FilePO;
 import com.dawnlight.chronicle_dawnlight.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -80,26 +83,19 @@ public class FileController {
      * @return ResponseEntity<FileSystemResource>
      */
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<FileSystemResource> downloadFile(@PathVariable("fileId") Integer fileId) {
-        try {
-            // 调用 Service 获取物理文件
-            File file = fileService.downloadFile(fileId);
-
-            // 构建文件下载响应
-            FileSystemResource resource = new FileSystemResource(file);
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
-            headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(file.length())
-                    .body(resource);
-        } catch (RuntimeException e) {
-            // 捕获异常并返回错误信息
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(null);
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") Integer fileId) {
+        File file = fileService.downloadFile(fileId);
+        if (file == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        Path path = Paths.get(file.getAbsolutePath());
+        Resource resource = new FileSystemResource(path);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)  // 确保返回的是文件的二进制数据
+                .body(resource);
     }
     /**
      * 删除文件

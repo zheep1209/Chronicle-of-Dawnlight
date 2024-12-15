@@ -14,14 +14,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 public class FileServiceImpl implements FileService {
 
-    // 基础路径
-    private static final String BASE_PATH = "C:\\Users\\zheep\\Documents\\Chronicle_Dawnlight\\uploads\\";
+// 使用相对路径（相对当前工作目录）
+
     @Autowired
     private FileMapper fileMapper;
     @Autowired
@@ -29,39 +35,35 @@ public class FileServiceImpl implements FileService {
     @Autowired
     private FolderService folderService;
 
+    private static final Path BASE_PATH = Paths.get("/var/uploads/");
+
     @Override
     public void uploadFile(FilePO file, MultipartFile multipartFile) {
-        // 确定存储路径
-        String userFolderPath = BASE_PATH + file.getUserId();
-        String fullPath = file.getFolderId() == null ? userFolderPath : BASE_PATH + getFolderPath(file.getFolderId());
-
-        // 检查目录是否存在，不存在时调用 createFolder 创建
-        File directory = new File(fullPath);
-        log.info("路径: {}", fullPath);
-        if (!directory.exists()) {
-            log.info("路径不存在");
-            FolderPO folder = new FolderPO();
-            folder.setUserId(file.getUserId());
-            folder.setName(BaseContext.getCurrentThreadId().toString());
-            folder.setParentId(null);
-            int folderId = folderService.createFolder(folder); // 调用 createFolder 方法创建数据库记录和物理目录
-            log.info("创建文件夹成功，ID: {}", folderId);
-            file.setFolderId(folderId);
-        }
-        // 如果文件夹ID为空，则保存到当前用户的根文件夹
-        if (file.getFolderId() == null) {
-            file.setFolderId(folderMapper.getFoldersByUserId(file.getUserId()).get(0).getId());
-        }
-
-        // 保存文件到物理路径
-        File targetFile = new File(fullPath + File.separator + file.getFileName());
+        // 检查并创建用户目录
+        Path userFolderPath = BASE_PATH.resolve(String.valueOf(file.getUserId()));
+        Path fullPath = file.getFolderId() == null ? userFolderPath : userFolderPath.resolve(getFolderPath(file.getFolderId()));
         try {
-            multipartFile.transferTo(targetFile);
+            if (!Files.exists(fullPath)) {
+                Files.createDirectories(fullPath);
+                Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-x---");
+                Files.setPosixFilePermissions(fullPath, perms);
+            }
         } catch (IOException e) {
-            throw new RuntimeException("文件保存失败", e);
+            log.error("文件夹创建失败: {}", fullPath, e);
+            throw new RuntimeException("无法创建文件夹: " + fullPath, e);
         }
-        // 设置文件路径并保存元信息
-        file.setFilePath(targetFile.getAbsolutePath());
+
+        // 保存文件
+        Path targetFile = fullPath.resolve(file.getFileName().toLowerCase());
+        try {
+            multipartFile.transferTo(targetFile.toFile());
+        } catch (IOException e) {
+            log.error("文件保存失败: {}", targetFile, e);
+            throw new RuntimeException("无法保存文件到路径: " + targetFile, e);
+        }
+
+        // 保存文件元信息
+        file.setFilePath(targetFile.toAbsolutePath().toString());
         fileMapper.uploadFile(file);
     }
 

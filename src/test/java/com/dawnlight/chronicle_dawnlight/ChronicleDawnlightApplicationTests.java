@@ -6,12 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class ChronicleDawnlightApplicationTests {
-
     @Test
     void contextLoads() {
     }
-
-
-
 }
 

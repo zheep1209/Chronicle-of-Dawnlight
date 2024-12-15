@@ -13,7 +13,7 @@ public interface UserMapper {
     Integer registerUser(@Param("user") UserPO user);
 
     /**
-     *用户名密码登录
+     *登录
      */
     String loginByPassword(@Param("identifier") String identifier, @Param("password") String password);
     /**
