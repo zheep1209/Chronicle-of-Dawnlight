@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
         String userId = UUID.randomUUID().toString();
         userPO.setId(userId);
 //        默认头像
-        userPO.setAvatar("https://img.picgo.net/2024/10/25/d693c6f605470263c9e42740e8bed7d2909387c156c4a646.png");
+        userPO.setAvatar("https://zheep.oss-cn-beijing.aliyuncs.com/%E9%BB%98%E8%AE%A4%E5%A4%B4%E5%83%8F.png");
 //        密码加密
         userPO.setPassword(DigestUtils.md5DigestAsHex(userDTO.getPassword().getBytes()));
 //        新增状态

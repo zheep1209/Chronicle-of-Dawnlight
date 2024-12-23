@@ -23,6 +23,7 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserMapper userMapper;
+
     /**
      * 用户注册
      */
@@ -73,8 +74,9 @@ public class UserController {
 
     /**
      * 提取生成Jwt方法
+     *
      * @param result .
-     * @param data .
+     * @param data   .
      * @return .
      */
     private Result getResult(Result result, Map<String, Object> data) {
@@ -97,9 +99,12 @@ public class UserController {
     /**
      * 更新数据
      */
-//    同时传多个需要修改的值可能有漏洞，需要修复
     @PutMapping("/update")
-    public Result update(@RequestParam(value = "id") String id, @RequestParam(value = "avatar", required = false) String avatar, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "username", required = false) String username, @RequestParam(value = "code", required = false) String code) throws BaseException {
+    public Result update(@RequestParam(value = "id") String id,
+                         @RequestParam(value = "avatar", required = false) String avatar,
+                         @RequestParam(value = "password", required = false) String password,
+                         @RequestParam(value = "username", required = false) String username,
+                         @RequestParam(value = "code", required = false) String code) throws BaseException {
         if (avatar != null) {
             userService.updateAvatar(id, avatar);
         }
