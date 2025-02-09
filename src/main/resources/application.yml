@@ -5,9 +5,9 @@ spring:
     username: zheep
     password: 15689092595zZ
   redis:
-    host: redis-11025.c299.asia-northeast1-1.gce.redns.redis-cloud.com
-    port: 11025
-    password: bAujYIfGojPIWyGctbzUG4kELGs7RTtB
+    host: redis-12485.crce178.ap-east-1-1.ec2.redns.redis-cloud.com
+    port: 12485
+    password: nvX0KCgMyJ2zjlmTv2LFmeBoDn63eUO0
     username: default
     #设置项目访问根路径
     #邮箱基本配置
